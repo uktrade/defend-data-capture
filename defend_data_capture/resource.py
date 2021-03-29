@@ -4,6 +4,9 @@ from supply_chains.models import (
     StrategicAction,
     StrategicActionUpdate,
     SupplyChain,
+    MaturitySelfAssessment,
+    VulnerabilityAssessment,
+    ScenarioAssessment,
 )
 
 
@@ -27,6 +30,21 @@ class StrategicActionUpdateResource(resources.ModelResource):
         model = StrategicActionUpdate
 
 
-class SupplyChainUpdateResource(resources.ModelResource):
+class SupplyChainResource(resources.ModelResource):
     class Meta:
         model = SupplyChain
+
+
+class MaturitySelfAssessmentResource(resources.ModelResource):
+    class Meta:
+        model = MaturitySelfAssessment
+
+
+class ScenarioAssessmentResource(resources.ModelResource):
+    class Meta:
+        model = ScenarioAssessment
+
+
+class VulnerabilityAssessmentResource(resources.ModelResource):
+    class Meta:
+        model = VulnerabilityAssessment
