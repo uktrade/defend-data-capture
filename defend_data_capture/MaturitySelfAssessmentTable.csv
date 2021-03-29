@@ -1,0 +1,2 @@
+id,date_created,maturity_rating_reason,maturity_rating_level,supply_chain
+uuid," datetime",,,id (uuid)

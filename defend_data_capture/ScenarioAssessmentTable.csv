@@ -1,0 +1,2 @@
+id,date_created,borders_closed_impact,borders_closed_rag_rating,storage_full_impact,storage_full_rag_rating,ports_blocked_impact,ports_blocked_rag_rating,raw_material_shortage_impact,raw_material_shortage_rag_rating,labour_shortage_impact,labour_shortage_rag_rating,demand_spike_impact,demand_spike_rag_rating,supply_chain
+uuid,datetime,,,,,,,,,,,,,id (uuid)

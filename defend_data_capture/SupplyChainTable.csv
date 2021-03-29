@@ -1,0 +1,2 @@
+id,name,last_submission_date,gov_department,contact_name,contact_email,vulnerability_status,vulnerability_status_disagree_reason,risk_severity_status,risk_severity_status_disagree_reason
+uuid,,datetime,id (uuid),,,,,,
