@@ -1,6 +1,6 @@
 __pycache__/
 *.py[cod]
-defend_data_capture/env/
+env
 .env
 
 node_modules
@@ -13,3 +13,6 @@ backend.pid
 # Folders and file auto-generated when cypress is run
 cypress/videos/
 cypress/screenshots/
+
+# VS code
+settings.json
