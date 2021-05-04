@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "A Django app focused on collecting data about the UK's most valuable supply chains. This app is primarily a form in which other government departments can submit updates and provide information about the supply chains they manage.",
   "private": true,
+  "engines": {
+    "node": "12.20.1"
+  },
   "dependencies": {
     "@ministryofjustice/frontend": "^0.2.2",
     "css-loader": "^3.3.0",
@@ -12,7 +15,7 @@
     "mini-css-extract-plugin": "^1.4.1",
     "node-sass": "^4.13.0",
     "sass-loader": "^8.0.0",
-    "webpack": "^5.31.2",
+    "webpack": "^4.46.0",
     "webpack-bundle-tracker": "^0.4.3",
     "webpack-cli": "^4.6.0"
   },
@@ -23,8 +26,9 @@
     "webpack-dev-server": "^3.9.0"
   },
   "scripts": {
-    "dev": "webpack --config webpack.config.js --mode development --watch",
-    "build": "webpack --config webpack.config.js",
-    "clean": "rm -f .defend-data-capture/assets/webpack_bundles/*"
+    "dev": "webpack --config webpack.config.js --mode=development --watch",
+    "build": "webpack --config webpack.config.js --mode=production",
+    "clean": "rm -f .defend-data-capture/assets/webpack_bundles/*",
+    "heroku-postbuild:": "npm run build"
   }
 }
