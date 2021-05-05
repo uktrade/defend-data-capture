@@ -147,7 +147,7 @@ WEBPACK_LOADER = {
 }
 
 STATIC_URL = "/static/"
-
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 CHARFIELD_MAX_LENGTH = 250
 
 STATICFILES_DIRS = [
