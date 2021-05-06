@@ -3,7 +3,6 @@ applications:
 - name: update-supply-chain-resilience-dev  
   services:
     - update-supply-chain-resilience-dev-db
-  command: python defend_data_capture/manage.py runserver
   buildpacks:
     - https://github.com/cloudfoundry/nodejs-buildpack.git
     - https://github.com/cloudfoundry/python-buildpack.git
