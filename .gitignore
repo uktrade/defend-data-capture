@@ -6,6 +6,7 @@ env
 node_modules
 npm-debug.log*
 defend_data_capture/assets/webpack_bundles
+defend_data_capture/static
 webpack-stats.json
 
 backend.pid
