@@ -17,7 +17,7 @@ module.exports = {
     path: path.resolve('./defend_data_capture/assets/webpack_bundles/'),
     // Where the compiled assets will be accessed through Django
     // (they are picked up by `collectstatic`)
-    publicPath: '/static/webpack_bundles/',
+    publicPath: '/defend_data_capture/static/',
     filename: '[name]-[hash].js',
   },
 
