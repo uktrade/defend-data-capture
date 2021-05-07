@@ -12,9 +12,11 @@ jobs:
       - name: Setup python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.8'
+          python-version: '3.8.8'
       - name: Install python packages
         run: pip install -r defend_data_capture/requirements.txt
+      - name: Run unit tests
+        run: which pip && python --version && pytest defend_data_capture --collect-only
       - name: Setup node
         uses: actions/setup-node@v2
         with:
@@ -25,7 +27,6 @@ jobs:
         run: nohup npm run dev &
       - name: Bring up db container
         run: docker-compose -f docker-compose.yaml up -d
-      - name: Run unit tests
-        run: pytest defend_data_capture
+
       - name: Run functional tests
         run: bash run_functional_tests.sh

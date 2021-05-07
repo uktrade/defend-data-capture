@@ -106,38 +106,46 @@
     </table>
 
     {% if view.sa_updates.has_other_pages %}
-        {% include 'includes/pagination.html' with objects=view.sa_updates objects_name="strategic actions" %} 
+        {% include 'includes/pagination.html' with objects=view.sa_updates objects_name="strategic actions" %}
     {% endif %}
 
     {% if not view.update_submitted %}
-        <h2 class="govuk-heading-l">Before you submit</h2>
-        <p class="govuk-body">
-            Before you submit, make sure you have updated and completed all<br>relevant sections. This includes:
-        </p>
-        <ul class="govuk-list govuk-list--bullet">
-            <li>
-                <a href={% url 'sc_summary' sc_slug=view.supply_chain.slug %} class="govuk-link">Supply chain summary</a>
-                <span>
-                    - key information, vulnerability assessment,
-                    scenario assessment, maturity self assessment, risk monitoring,<br>archived strategic actions
-                </span>
-            </li>
-            <li>
-                <a href="{% url 'strat_action_summary' view.supply_chain.slug %}" class="govuk-link">Strategic action summary</a>
-                <span>
-                    - description of the action, impact, strategic action framework category and depedencies
-                </span>
-            </li>
-        </ul>
-
         <form action={% url 'tlist' sc_slug=view.supply_chain.slug %} method="post">
             {% csrf_token %}
             <button class="govuk-button" data-module="govuk-button" type="submit">
-                Submit update
+                Submit monthly update
             </button>
         </form>
     {% else %}
-        <a href={% url 'index' %} class="govuk-button govuk-button--secondary">Back to home</a>
+    <br>
+    <br>
     {% endif %}
+
+
+    <h2 class="govuk-heading-l">Strategic action summary</h2>
+    <p class="govuk-body">
+        Make sure you have updated and completed all relevant sections.
+    </p>
+    <p class="govuk-body">
+        This includes: Description of the action, impact, strategic action framework category and depedencies
+    </p>
+    <p class="govuk-body">
+        <a href={% url 'strat_action_summary' view.supply_chain.slug %} class="govuk-link">View strategic action summary</a>
+    </p>
+
+    <h2 class="govuk-heading-l">Supply chain summary</h2>
+    <p class="govuk-body">
+        Make sure you have updated and completed all relevant sections.
+    </p>
+    <p class="govuk-body">
+        This includes: Key information, vulnerability assessment, scenario assessment, maturity self assessment, risk monitoring and archived strategic actions
+    </p>
+    <p class="govuk-body">
+        <a href={% url 'sc_summary' view.supply_chain.slug %} class="govuk-link">View supply chain summary</a>
+    </p>
+
+    <br>
+    <a href={% url 'index' %} class="govuk-button govuk-button--secondary">Back to home</a>
+
 
 {% endblock %}

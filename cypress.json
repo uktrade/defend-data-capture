@@ -1,5 +1,7 @@
 {
     "baseUrl": "http://localhost:8001",
     "defaultCommandTimeout": 2000,
-    "videoUploadOnPasses": false
+    "videoUploadOnPasses": false,
+    "integrationFolder": "cypress/integration",
+    "testFiles": "*.js"
 }

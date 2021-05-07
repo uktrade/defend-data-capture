@@ -42,14 +42,18 @@ describe('The Supply Chain Tasklist Page', () => {
     cy.get('td').contains('Not started')
   })
   it('displays enabled submit button', () => {
-    cy.get('button').contains('Submit update')
+    cy.get('button').contains('Submit monthly update')
   })
   it('links to the strategic action summary page', () => {
-    cy.get('a').contains('Strategic action summary').click()
-    cy.url().should(
-      'eq',
-      Cypress.config('baseUrl') + `/${supplyChain.slug}/strategic-actions`
-    )
+    cy.get('a').contains('View strategic action summary')
+    .should('have.attr', 'href')
+    .and('equal', `/${supplyChain.slug}/strategic-actions`)
+  })
+  it('links to the supply chain summary page', () => {
+    cy.get('a').contains('View supply chain summary')
+    .should('have.attr', 'href')
+    .and('equal', `/${supplyChain.slug}/summary`)
+
   })
 })
 
@@ -70,7 +74,7 @@ describe('Allowed to submit completed Supply Chains', () => {
     cy.get('td').contains('completed')
   })
   it('displays enabled submit button', () => {
-    cy.get('button').contains('Submit update')
+    cy.get('button').contains('Submit monthly update')
   })
   if (Cypress.env('RUNNING_LOCALLY') === '0') {
     // This test will only be run on CI or non-local environments as its un-safe operation
@@ -155,7 +159,7 @@ describe('Paginate Strategic actions', () => {
     cy.url().should('eq', Cypress.config('baseUrl') + `/${largeSC.slug}?page=1`)
   })
   it('displays enabled submit button', () => {
-    cy.get('button').contains('Submit update')
+    cy.get('button').contains('Submit monthly update')
   })
 })
 

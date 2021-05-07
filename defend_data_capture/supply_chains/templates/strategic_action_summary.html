@@ -18,7 +18,7 @@
 <h1 class="govuk-heading-xl">Strategic actions for
   <br>
   {{ supply_chain.name }}</h1>
-<p class="govuk-body">Select a strategic action to view and edit its details.</p>
+<p class="govuk-body">Select a strategic action to view its details.</p>
 <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-with-summary-sections">
   {% for action in strategic_actions %}
   <div class="govuk-accordion__section">
@@ -41,11 +41,6 @@
             <dd class="govuk-summary-list__value">
               {{ action.description|default:"No information" }}
             </dd>
-            <dd class="govuk-summary-list__actions">
-              <a class="govuk-link" href="#">
-                Change<span class="govuk-visually-hidden"> description</span>
-              </a>
-            </dd>
           </div>
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">
@@ -56,11 +51,6 @@
             <dd class="govuk-summary-list__value">
               {{ action.impact|default:"No information" }}
             </dd>
-            <dd class="govuk-summary-list__actions">
-              <a class="govuk-link" href="#">
-                Change<span class="govuk-visually-hidden"> impact</span>
-              </a>
-            </dd>
           </div>
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">
@@ -68,11 +58,6 @@
             </dt>
             <dd class="govuk-summary-list__value">
               {{ action.get_category_display|default:"No information" }}
-            </dd>
-            <dd class="govuk-summary-list__actions">
-              <a class="govuk-link" href="#">
-                Change<span class="govuk-visually-hidden"> category</span>
-              </a>
             </dd>
           </div>
           <div class="govuk-summary-list__row">
@@ -82,11 +67,6 @@
             <dd class="govuk-summary-list__value">
               {{ action.get_geographic_scope_display|default:"No information" }}
             </dd>
-            <dd class="govuk-summary-list__actions">
-              <a class="govuk-link" href="#">
-                Change<span class="govuk-visually-hidden"> geographic scope</span>
-              </a>
-            </dd>
           </div>
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">
@@ -94,11 +74,6 @@
             </dt>
             <dd class="govuk-summary-list__value">
               {{ action.get_supporting_organisations_display|default:"No information" }}
-            </dd>
-            <dd class="govuk-summary-list__actions">
-              <a class="govuk-link" href="#">
-                Change<span class="govuk-visually-hidden"> supporting departments</span>
-              </a>
             </dd>
           </div>
           <div class="govuk-summary-list__row">
@@ -112,11 +87,6 @@
               {{ action.target_completion_date|date:"SHORT_DATE_FORMAT"|default:"No information" }}
               {% endif %}
             </dd>
-            <dd class="govuk-summary-list__actions">
-              <a class="govuk-link" href="#">
-                Change<span class="govuk-visually-hidden"> date of intended completion</span>
-              </a>
-            </dd>
           </div>
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">
@@ -125,11 +95,6 @@
             <dd class="govuk-summary-list__value">
               {{ action.other_dependencies|default:"No information" }}
             </dd>
-            <dd class="govuk-summary-list__actions">
-              <a class="govuk-link" href="#">
-                Change<span class="govuk-visually-hidden"> other dependencies</span>
-              </a>
-            </dd>
           </div>
           <div class="govuk-summary-list__row govuk-summary-list--no-border">
             <dt class="govuk-summary-list__key">
@@ -137,11 +102,6 @@
             </dt>
             <dd class="govuk-summary-list__value">
               {{ action.specific_related_products|default:"No information" }}
-            </dd>
-            <dd class="govuk-summary-list__actions">
-              <a class="govuk-link" href="#">
-                Change<span class="govuk-visually-hidden"> specific products the action relates to</span>
-              </a>
             </dd>
           </div>
       </dl>

@@ -10,7 +10,7 @@ convertdate==2.3.2
 defusedxml==0.6.0
 diff-match-patch==20200713
 distlib==0.3.1
-django>=3.1.6
+django>=3.1.10
 django-environ==0.4.5
 django-import-export==2.5.0
 django-reversion==3.0.9
