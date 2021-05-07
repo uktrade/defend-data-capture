@@ -1,0 +1,9 @@
+{% for field in form %}
+    {% if field.errors %}
+        {% for error in field.errors %}
+            <li>
+                <a href="{{ url_for_errors }}#{{ field.id_for_label }}">{{ error }}</a>
+            </li>
+        {% endfor %}
+    {% endif %}
+{% endfor %}

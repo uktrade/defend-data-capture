@@ -1,13 +1,25 @@
+from unittest import mock
+
+import pytest
 from datetime import date, timedelta
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.test import Client
 from django.urls import reverse
 
 from accounts.models import User
 from accounts.test.factories import GovDepartmentFactory
+from supply_chains.forms import YesNoChoices, ApproximateTimings
+from supply_chains.models import SupplyChain, StrategicAction, StrategicActionUpdate
+from supply_chains.test.factories import (
+    SupplyChainFactory,
+    StrategicActionFactory,
+    StrategicActionUpdateFactory,
+)
 from supply_chains.models import SupplyChain
 from supply_chains.test.factories import StrategicActionFactory, SupplyChainFactory
+from supply_chains.views import MonthlyUpdateInfoEditView
 
 pytestmark = pytest.mark.django_db
 
@@ -132,3 +144,464 @@ def test_strat_action_summary_page_pagination(logged_in_client, test_user):
     )
     assert response.status_code == 200
     assert len(response.context["strategic_actions"]) == 4
+
+
+@pytest.mark.django_db()
+class TestMonthlyUpdateTimingPage:
+    def test_posting_form_saves_changed_target_completion_date_to_strategic_action_update(
+        self,
+    ):
+        supply_chain: SupplyChain = SupplyChainFactory()
+        strategic_action: StrategicAction = StrategicActionFactory(
+            supply_chain=supply_chain
+        )
+        strategic_action.target_completion_date = None
+        strategic_action.is_ongoing = True
+        strategic_action.save()
+        strategic_action_update: StrategicActionUpdate = StrategicActionUpdateFactory(
+            strategic_action=strategic_action,
+            status=StrategicActionUpdate.Status.IN_PROGRESS,
+            supply_chain=strategic_action.supply_chain,
+            reason_for_completion_date_change="All things must pass.",
+        )
+
+        mock_today = date(year=2021, month=4, day=23)
+        with mock.patch(
+            "supply_chains.forms.date",
+            mock.Mock(today=mock.Mock(return_value=mock_today)),
+        ):
+            expected_target_completion_date = mock_today + relativedelta(years=+1)
+            form_data = {
+                "is_completion_date_known": YesNoChoices.NO,
+                f"{YesNoChoices.NO}-surrogate_is_ongoing": ApproximateTimings.ONE_YEAR,
+            }
+            url_kwargs = {
+                "supply_chain_slug": strategic_action.supply_chain.slug,
+                "strategic_action_slug": strategic_action.slug,
+                "update_slug": strategic_action_update.slug,
+            }
+            url = reverse("monthly-update-timing-edit", kwargs=url_kwargs)
+            client = Client()
+            response = client.post(url, form_data)
+            assert response.status_code == 302
+            strategic_action.refresh_from_db()
+            assert strategic_action.target_completion_date is None
+            strategic_action_update.refresh_from_db()
+            assert (
+                strategic_action_update.changed_target_completion_date
+                == expected_target_completion_date
+            )
+
+
+@pytest.mark.django_db()
+class TestNoCompletionDateMonthlyUpdateNavigationLinks:
+    def test_info_view_has_info_timing_status_summary_links(self):
+        supply_chain = SupplyChainFactory()
+        strategic_action = StrategicActionFactory(supply_chain=supply_chain)
+        strategic_action_update = StrategicActionUpdateFactory(
+            strategic_action=strategic_action,
+            supply_chain=strategic_action.supply_chain,
+        )
+        url = reverse(
+            "monthly-update-info-edit",
+            kwargs={
+                "supply_chain_slug": strategic_action.supply_chain.slug,
+                "strategic_action_slug": strategic_action.slug,
+                "update_slug": strategic_action_update.slug,
+            },
+        )
+        client = Client()
+
+        strategic_action.target_completion_date = None
+        strategic_action.save()
+        response = client.get(url)
+
+        navigation_links = response.context_data["navigation_links"]
+        assert "Info" in navigation_links.keys()
+        assert "Timing" in navigation_links.keys()
+        assert "Status" in navigation_links.keys()
+        assert "RevisedTiming" not in navigation_links.keys()
+        assert "Summary" in navigation_links.keys()
+
+    def test_timing_view_has_info_timing_status_summary_links(self):
+        supply_chain = SupplyChainFactory()
+        strategic_action = StrategicActionFactory(supply_chain=supply_chain)
+        strategic_action_update = StrategicActionUpdateFactory(
+            strategic_action=strategic_action,
+            supply_chain=strategic_action.supply_chain,
+        )
+        url = reverse(
+            "monthly-update-timing-edit",
+            kwargs={
+                "supply_chain_slug": strategic_action.supply_chain.slug,
+                "strategic_action_slug": strategic_action.slug,
+                "update_slug": strategic_action_update.slug,
+            },
+        )
+        client = Client()
+
+        strategic_action.target_completion_date = None
+        strategic_action.save()
+        response = client.get(url)
+
+        navigation_links = response.context_data["navigation_links"]
+        assert "Info" in navigation_links.keys()
+        assert "Timing" in navigation_links.keys()
+        assert "Status" in navigation_links.keys()
+        assert "RevisedTiming" not in navigation_links.keys()
+        assert "Summary" in navigation_links.keys()
+
+    def test_status_view_has_info_timing_status_summary_links(self):
+        supply_chain = SupplyChainFactory()
+        strategic_action = StrategicActionFactory(supply_chain=supply_chain)
+        strategic_action_update = StrategicActionUpdateFactory(
+            strategic_action=strategic_action,
+            supply_chain=strategic_action.supply_chain,
+        )
+        url = reverse(
+            "monthly-update-status-edit",
+            kwargs={
+                "supply_chain_slug": strategic_action.supply_chain.slug,
+                "strategic_action_slug": strategic_action.slug,
+                "update_slug": strategic_action_update.slug,
+            },
+        )
+        client = Client()
+
+        strategic_action.target_completion_date = None
+        strategic_action.save()
+        response = client.get(url)
+
+        navigation_links = response.context_data["navigation_links"]
+        assert "Info" in navigation_links.keys()
+        assert "Timing" in navigation_links.keys()
+        assert "Status" in navigation_links.keys()
+        assert "RevisedTiming" not in navigation_links.keys()
+        assert "Summary" in navigation_links.keys()
+
+    def test_summary_view_has_info_timing_status_summary_links(self):
+        supply_chain = SupplyChainFactory()
+        strategic_action = StrategicActionFactory(supply_chain=supply_chain)
+        strategic_action_update = StrategicActionUpdateFactory(
+            strategic_action=strategic_action,
+            supply_chain=strategic_action.supply_chain,
+        )
+        url = reverse(
+            "monthly-update-summary",
+            kwargs={
+                "supply_chain_slug": strategic_action.supply_chain.slug,
+                "strategic_action_slug": strategic_action.slug,
+                "update_slug": strategic_action_update.slug,
+            },
+        )
+        client = Client()
+
+        strategic_action.target_completion_date = None
+        strategic_action.save()
+        response = client.get(url)
+
+        navigation_links = response.context_data["navigation_links"]
+        assert "Info" in navigation_links.keys()
+        assert "Timing" in navigation_links.keys()
+        assert "Status" in navigation_links.keys()
+        assert "RevisedTiming" not in navigation_links.keys()
+        assert "Summary" in navigation_links.keys()
+
+
+@pytest.mark.django_db()
+class TestWithCompletionDateMonthlyUpdateNavigationLinks:
+    def test_info_view_has_info_status_summary_links_if_completion_date_unchanged(self):
+        supply_chain = SupplyChainFactory()
+        strategic_action = StrategicActionFactory(supply_chain=supply_chain)
+        strategic_action_update = StrategicActionUpdateFactory(
+            strategic_action=strategic_action,
+            supply_chain=strategic_action.supply_chain,
+        )
+        url = reverse(
+            "monthly-update-info-edit",
+            kwargs={
+                "supply_chain_slug": strategic_action.supply_chain.slug,
+                "strategic_action_slug": strategic_action.slug,
+                "update_slug": strategic_action_update.slug,
+            },
+        )
+        client = Client()
+        response = client.get(url)
+
+        navigation_links = response.context_data["navigation_links"]
+        assert "Info" in navigation_links.keys()
+        assert "Timing" not in navigation_links.keys()
+        assert "Status" in navigation_links.keys()
+        assert "RevisedTiming" not in navigation_links.keys()
+        assert "Summary" in navigation_links.keys()
+
+    def test_info_view_has_info_status_revisedtiming_summary_links_if_completion_date_changed(
+        self,
+    ):
+        supply_chain = SupplyChainFactory()
+        strategic_action = StrategicActionFactory(supply_chain=supply_chain)
+        strategic_action_update = StrategicActionUpdateFactory(
+            strategic_action=strategic_action,
+            supply_chain=strategic_action.supply_chain,
+        )
+        url = reverse(
+            "monthly-update-info-edit",
+            kwargs={
+                "supply_chain_slug": strategic_action.supply_chain.slug,
+                "strategic_action_slug": strategic_action.slug,
+                "update_slug": strategic_action_update.slug,
+            },
+        )
+        client = Client()
+
+        strategic_action_update.changed_target_completion_date = date(
+            year=2021, month=12, day=25
+        )
+        strategic_action_update.save()
+
+        response = client.get(url)
+
+        navigation_links = response.context_data["navigation_links"]
+        assert "Info" in navigation_links.keys()
+        assert "Timing" not in navigation_links.keys()
+        assert "Status" in navigation_links.keys()
+        assert "RevisedTiming" in navigation_links.keys()
+        assert "Summary" in navigation_links.keys()
+
+    def test_info_view_has_info_status_revisedtiming_summary_links_if_is_ongoing_changed(
+        self,
+    ):
+        supply_chain = SupplyChainFactory()
+        strategic_action = StrategicActionFactory(supply_chain=supply_chain)
+        strategic_action_update = StrategicActionUpdateFactory(
+            strategic_action=strategic_action,
+            supply_chain=strategic_action.supply_chain,
+        )
+        url = reverse(
+            "monthly-update-info-edit",
+            kwargs={
+                "supply_chain_slug": strategic_action.supply_chain.slug,
+                "strategic_action_slug": strategic_action.slug,
+                "update_slug": strategic_action_update.slug,
+            },
+        )
+        client = Client()
+
+        strategic_action_update.changed_is_ongoing = True
+        strategic_action_update.save()
+
+        response = client.get(url)
+
+        navigation_links = response.context_data["navigation_links"]
+        assert "Info" in navigation_links.keys()
+        assert "Timing" not in navigation_links.keys()
+        assert "Status" in navigation_links.keys()
+        assert "RevisedTiming" in navigation_links.keys()
+        assert "Summary" in navigation_links.keys()
+
+    def test_status_view_has_info_status_summary_links_if_completion_date_unchanged(
+        self,
+    ):
+        supply_chain = SupplyChainFactory()
+        strategic_action = StrategicActionFactory(supply_chain=supply_chain)
+        strategic_action_update = StrategicActionUpdateFactory(
+            strategic_action=strategic_action,
+            supply_chain=strategic_action.supply_chain,
+        )
+        url = reverse(
+            "monthly-update-status-edit",
+            kwargs={
+                "supply_chain_slug": strategic_action.supply_chain.slug,
+                "strategic_action_slug": strategic_action.slug,
+                "update_slug": strategic_action_update.slug,
+            },
+        )
+        client = Client()
+        response = client.get(url)
+
+        navigation_links = response.context_data["navigation_links"]
+        assert "Info" in navigation_links.keys()
+        assert "Timing" not in navigation_links.keys()
+        assert "Status" in navigation_links.keys()
+        assert "RevisedTiming" not in navigation_links.keys()
+        assert "Summary" in navigation_links.keys()
+
+    def test_status_view_has_info_status_revisedtiming_summary_links_if_completion_date_changed(
+        self,
+    ):
+        supply_chain = SupplyChainFactory()
+        strategic_action = StrategicActionFactory(supply_chain=supply_chain)
+        strategic_action_update = StrategicActionUpdateFactory(
+            strategic_action=strategic_action,
+            supply_chain=strategic_action.supply_chain,
+        )
+        url = reverse(
+            "monthly-update-status-edit",
+            kwargs={
+                "supply_chain_slug": strategic_action.supply_chain.slug,
+                "strategic_action_slug": strategic_action.slug,
+                "update_slug": strategic_action_update.slug,
+            },
+        )
+        client = Client()
+
+        strategic_action_update.changed_target_completion_date = date(
+            year=2021, month=12, day=25
+        )
+        strategic_action_update.save()
+
+        response = client.get(url)
+
+        navigation_links = response.context_data["navigation_links"]
+        assert "Info" in navigation_links.keys()
+        assert "Timing" not in navigation_links.keys()
+        assert "Status" in navigation_links.keys()
+        assert "RevisedTiming" in navigation_links.keys()
+        assert "Summary" in navigation_links.keys()
+
+    def test_status_view_has_info_status_revisedtiming_summary_links_if_is_ongoing_changed(
+        self,
+    ):
+        supply_chain = SupplyChainFactory()
+        strategic_action = StrategicActionFactory(supply_chain=supply_chain)
+        strategic_action_update = StrategicActionUpdateFactory(
+            strategic_action=strategic_action,
+            supply_chain=strategic_action.supply_chain,
+        )
+        url = reverse(
+            "monthly-update-status-edit",
+            kwargs={
+                "supply_chain_slug": strategic_action.supply_chain.slug,
+                "strategic_action_slug": strategic_action.slug,
+                "update_slug": strategic_action_update.slug,
+            },
+        )
+        client = Client()
+
+        strategic_action_update.changed_is_ongoing = True
+        strategic_action_update.save()
+
+        response = client.get(url)
+
+        navigation_links = response.context_data["navigation_links"]
+        assert "Info" in navigation_links.keys()
+        assert "Timing" not in navigation_links.keys()
+        assert "Status" in navigation_links.keys()
+        assert "RevisedTiming" in navigation_links.keys()
+        assert "Summary" in navigation_links.keys()
+
+    def test_revised_timing_view_has_info_status_revisedtiming_summary_links(self):
+        supply_chain = SupplyChainFactory()
+        strategic_action = StrategicActionFactory(supply_chain=supply_chain)
+        strategic_action_update = StrategicActionUpdateFactory(
+            strategic_action=strategic_action,
+            supply_chain=strategic_action.supply_chain,
+        )
+        url = reverse(
+            "monthly-update-revised-timing-edit",
+            kwargs={
+                "supply_chain_slug": strategic_action.supply_chain.slug,
+                "strategic_action_slug": strategic_action.slug,
+                "update_slug": strategic_action_update.slug,
+            },
+        )
+        client = Client()
+        response = client.get(url)
+
+        navigation_links = response.context_data["navigation_links"]
+        assert "Info" in navigation_links.keys()
+        assert "Timing" not in navigation_links.keys()
+        assert "Status" in navigation_links.keys()
+        assert "RevisedTiming" in navigation_links.keys()
+        assert "Summary" in navigation_links.keys()
+
+    def test_summary_view_has_info_status_summary_links_if_completion_date_unchanged(
+        self,
+    ):
+        supply_chain = SupplyChainFactory()
+        strategic_action = StrategicActionFactory(supply_chain=supply_chain)
+        strategic_action_update = StrategicActionUpdateFactory(
+            strategic_action=strategic_action,
+            supply_chain=strategic_action.supply_chain,
+        )
+        url = reverse(
+            "monthly-update-summary",
+            kwargs={
+                "supply_chain_slug": strategic_action.supply_chain.slug,
+                "strategic_action_slug": strategic_action.slug,
+                "update_slug": strategic_action_update.slug,
+            },
+        )
+        client = Client()
+        response = client.get(url)
+
+        navigation_links = response.context_data["navigation_links"]
+        assert "Info" in navigation_links.keys()
+        assert "Timing" not in navigation_links.keys()
+        assert "Status" in navigation_links.keys()
+        assert "RevisedTiming" not in navigation_links.keys()
+        assert "Summary" in navigation_links.keys()
+
+    def test_summary_view_has_info_status_revised_timing_summary_links_if_completion_date_changed(
+        self,
+    ):
+        supply_chain = SupplyChainFactory()
+        strategic_action = StrategicActionFactory(supply_chain=supply_chain)
+        strategic_action_update = StrategicActionUpdateFactory(
+            strategic_action=strategic_action,
+            supply_chain=strategic_action.supply_chain,
+        )
+        url = reverse(
+            "monthly-update-summary",
+            kwargs={
+                "supply_chain_slug": strategic_action.supply_chain.slug,
+                "strategic_action_slug": strategic_action.slug,
+                "update_slug": strategic_action_update.slug,
+            },
+        )
+        client = Client()
+
+        strategic_action_update.changed_target_completion_date = date(
+            year=2021, month=12, day=25
+        )
+        strategic_action_update.save()
+
+        response = client.get(url)
+
+        navigation_links = response.context_data["navigation_links"]
+        assert "Info" in navigation_links.keys()
+        assert "Timing" not in navigation_links.keys()
+        assert "Status" in navigation_links.keys()
+        assert "RevisedTiming" in navigation_links.keys()
+        assert "Summary" in navigation_links.keys()
+
+    def test_summary_view_has_info_status_revised_timing_summary_links_if_is_ongoing_changed(
+        self,
+    ):
+        supply_chain = SupplyChainFactory()
+        strategic_action = StrategicActionFactory(supply_chain=supply_chain)
+        strategic_action_update = StrategicActionUpdateFactory(
+            strategic_action=strategic_action,
+            supply_chain=strategic_action.supply_chain,
+        )
+        url = reverse(
+            "monthly-update-summary",
+            kwargs={
+                "supply_chain_slug": strategic_action.supply_chain.slug,
+                "strategic_action_slug": strategic_action.slug,
+                "update_slug": strategic_action_update.slug,
+            },
+        )
+        client = Client()
+
+        strategic_action_update.changed_is_ongoing = True
+        strategic_action_update.save()
+
+        response = client.get(url)
+
+        navigation_links = response.context_data["navigation_links"]
+        assert "Info" in navigation_links.keys()
+        assert "Timing" not in navigation_links.keys()
+        assert "Status" in navigation_links.keys()
+        assert "RevisedTiming" in navigation_links.keys()
+        assert "Summary" in navigation_links.keys()

@@ -1,0 +1,47 @@
+{% extends 'supply_chains/monthly-update-form-base.html' %}
+
+{% block form %}
+    {% with strategic_action_update.strategic_action.last_submitted_update as previous_update %}
+        {% if previous_update.content %}
+            <div class="app-dit-panel">
+                <h2 class="govuk-heading-m">Last update</h2>
+                <p>{{ previous_update.content }}</p>
+            </div>
+        {% endif %}
+    {% endwith %}
+    <form method="post" action="">
+        {% csrf_token %}
+        <div class="govuk-form-group{% if form.errors %} govuk-form-group--error{% endif %}">
+            <h2 class="govuk-label-wrapper govuk-heading-l">
+                <label class="govuk-label govuk-label--l" for="{{ form.content.id_for_label }}">
+                Latest monthly update
+                </label>
+            </h2>
+            <div class="govuk-hint">
+                <p>Include details of:</p>
+                <ul class="govuk-list govuk-list--bullet govuk-hint">
+                    <li>activities undertaken</li>
+                    <li>milestones reached</li>
+                    <li>any other strategic action developments.</li>
+                </ul>
+            </div>
+            {% if form.content.errors %}
+                {% for error in form.content.errors %}
+                    <span class="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span> {{ error }}
+                    </span>
+                {% endfor %}
+            {% endif %}
+            {{ form.content }}
+        </div>
+        <div class="govuk-button-group">
+            <button class="govuk-button" data-module="govuk-button" type="submit">
+                Save and continue
+            </button>
+
+            <a href="{% url 'tlist' sc_slug=strategic_action_update.supply_chain.slug %}" class="govuk-button govuk-button--secondary" data-module="govuk-button" type="button">
+                Cancel
+            </a>
+        </div>
+    </form>
+{% endblock form %}

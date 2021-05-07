@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Strategic Actions</title>
+</head>
+<body>
+<h1>Strategic Actions</h1>
+<ol>
+    {% for strategic_action in strategic_actions %}
+        <li>
+            {{ strategic_action.name }}
+            {{ strategic_action.id }}
+            <a href="{% url 'monthly-update-create' supply_chain_slug=strategic_action.supply_chain.slug strategic_action_slug=strategic_action.slug %}">Monthly Update</a>
+        </li>
+    {% empty %}
+        <li>(No Strategic Actions)</li>
+    {% endfor %}
+</ol>
+</body>
+</html>

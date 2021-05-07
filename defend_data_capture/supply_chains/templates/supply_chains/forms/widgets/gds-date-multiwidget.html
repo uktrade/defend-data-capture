@@ -1,0 +1,15 @@
+<div class="govuk-form-group">
+    {% with widget.attrs.id as id %}
+        {% for subwidget in labelled_widgets %}
+            <div class="govuk-date-input__item">
+                <div class="govuk-form-group">
+                    <label class="govuk-label govuk-date-input__label" for="{{ subwidget.widget.attrs.id }}">
+                        {{ subwidget.label }}
+                    </label>
+                    {% with widget=subwidget.widget %}
+                        {% include widget.template_name %}
+                    {% endwith %}
+                </div>
+            </div>
+        {% endfor %}
+    {% endwith %}

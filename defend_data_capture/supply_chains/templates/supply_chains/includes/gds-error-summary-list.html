@@ -1,0 +1,12 @@
+{% with form.url_for_errors as url_for_errors %}
+    {% for field_name, errors in form.errors.items %}
+        {% if field_name not in form.fields %}
+            {# this field must be in a detail form… #}
+            {% with form.detail_form_for_current_selection as form %}
+                {% include 'supply_chains/includes/gds-error-summary-item.html' %}
+            {% endwith %}
+        {% else %}
+            {% include 'supply_chains/includes/gds-error-summary-item.html' %}
+        {% endif %}
+    {% endfor %}
+{% endwith %}

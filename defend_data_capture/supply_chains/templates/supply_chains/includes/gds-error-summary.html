@@ -1,0 +1,13 @@
+{% if form.errors %}
+{#  Should really check for non_field_errors too, but I don't think we'll encounter any of those at this stage  #}
+    <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+        <h2 class="govuk-error-summary__title" id="error-summary-title">
+            There is a problem
+        </h2>
+        <div class="govuk-error-summary__body">
+            <ul class="govuk-list govuk-error-summary__list">
+                {% include "supply_chains/includes/gds-error-summary-list.html" %}
+            </ul>
+        </div>
+    </div>
+{% endif %}

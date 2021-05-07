@@ -1,0 +1,14 @@
+{% if strategic_action_update.some_completion_date %}
+    <div class="govuk-inset-text">
+        <h2 class="govuk-heading-s">Current estimated date of completion</h2>
+        <p>{{ strategic_action_update.some_completion_date|date:"j F Y" }}</p>
+    </div>
+{% else %}
+    <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+            <span class="govuk-warning-text__assistive">Warning</span>
+            There's no expected completion date for this action.
+        </strong>
+    </div>
+{% endif %}

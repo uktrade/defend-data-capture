@@ -11,6 +11,9 @@ $govuk-image-url-function: frontend-image-url;
 
 @import "~govuk-frontend/govuk/all";
 @import "~@ministryofjustice/frontend/moj/components/pagination/pagination";
+@import "~@ministryofjustice/frontend/moj/settings/measurements";
+@import "~@ministryofjustice/frontend/moj/objects/width-container";
+@import "~@ministryofjustice/frontend/moj/components/sub-navigation/sub-navigation";
 
 .app-header-span {
   float: right;
@@ -30,4 +33,10 @@ $govuk-image-url-function: frontend-image-url;
 .app-switch-to-tool-link {
   float: right;
   padding-top: 4px;
+}
+
+.app-dit-panel {
+  @include govuk-responsive-padding(6);
+  @include govuk-responsive-margin(6, 'bottom');
+  background-color: govuk-colour("light-grey", $legacy: "grey-4");
 }

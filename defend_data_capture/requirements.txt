@@ -31,10 +31,12 @@ korean-lunar-calendar==0.2.1
 MarkupPy==1.14
 mypy-extensions==0.4.3
 nodeenv==1.5.0
+numpy==1.20.1
 oauthlib==3.1.0
 odfpy==1.4.1
 openpyxl==3.0.6
 packaging==20.9
+pandas==1.2.3
 pathspec==0.8.1
 pluggy==0.13.1
 pre-commit==2.10.0

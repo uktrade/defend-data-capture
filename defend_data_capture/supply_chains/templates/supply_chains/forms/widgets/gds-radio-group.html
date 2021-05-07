@@ -1,0 +1,18 @@
+<div class="govuk-form-group">
+    <fieldset class="govuk-fieldset">
+        {% if select_label %}
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+            <h2 class="govuk-fieldset__heading ">
+                {{ select_label }}
+            </h2>
+        </legend>
+        {% endif %}
+        <div class="govuk-radios{% if has_details %}  govuk-radios--conditional{% endif %}"{% if has_details %} data-module="govuk-radios"{% endif %}>
+            {% for _, options, index in widget.optgroups %}
+                {% with options.0 as radio %}
+                    {% include radio.template_name with widget=radio %}
+                {% endwith %}
+            {% endfor %}
+        </div>
+    </fieldset>
+</div>

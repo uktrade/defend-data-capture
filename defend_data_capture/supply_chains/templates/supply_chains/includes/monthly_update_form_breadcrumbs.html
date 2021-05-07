@@ -1,0 +1,12 @@
+<nav class="moj-sub-navigation" aria-label="Sub navigation">
+    <ol class="moj-sub-navigation__list">
+        {% for _, link_data in navigation_links.items %}
+            <li class="moj-sub-navigation__item">
+                <a class="moj-sub-navigation__link"{% if link_data.is_current_page %} aria-current="page"{% endif %} href="{{ link_data.url }}">
+                    {{ forloop.counter }}.
+                    {{ link_data.label }}
+                </a>
+            </li>
+        {% endfor %}
+    </ol>
+</nav>

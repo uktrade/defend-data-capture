@@ -1,0 +1,26 @@
+<div class="govuk-form-group">
+    <!-- completion-date.html -->
+    <fieldset class="govuk-fieldset" role="group" aria-describedby="{{ id }}-hint">
+        {% if legend %}
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                <p class="govuk-body">
+                    {{ legend }}
+                </p>
+            </legend>
+        {% endif %}
+        <div class="govuk-body">
+            {{ form.changed_target_completion_date.label }}
+        </div>
+        <div id="{{ id }}-hint" class="govuk-hint">
+            For example, 14 9 2021
+        </div>
+        <div class="govuk-date-input" id="{{ id }}-container">
+            {% for error in form.changed_target_completion_date.errors %}
+                <span class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span> {{ error }}
+                            </span>
+            {% endfor %}
+            {{ form.changed_target_completion_date }}
+        </div>
+    </fieldset>
+</div>

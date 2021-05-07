@@ -1,8 +1,11 @@
 from datetime import date, timedelta
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 
+from supply_chains.models import SupplyChain, StrategicActionUpdate, RAGRating
+from supply_chains.test.factories import SupplyChainFactory, StrategicActionFactory
 from supply_chains.models import SupplyChain, StrategicActionUpdate
 from supply_chains.test.factories import (
     SupplyChainFactory,
@@ -88,3 +91,291 @@ class TestSAUModel:
         # Act
         # Assert
         assert date.today().strftime("%m-%Y") == sau.slug
+
+    def test_slug_init_without_factory(self):
+        # Arrange
+        strategic_action = StrategicActionFactory()
+        # Act
+        sau = StrategicActionUpdate.objects.create(
+            status=StrategicActionUpdate.Status.IN_PROGRESS,
+            supply_chain=strategic_action.supply_chain,
+            strategic_action=strategic_action,
+        )
+        # Assert
+        assert date.today().strftime("%m-%Y") == sau.slug
+
+
+@pytest.mark.django_db()
+class TestStrategicActionUpdate:
+    def setup_method(self):
+        supply_chain = SupplyChainFactory()
+        strategic_action = StrategicActionFactory(supply_chain=supply_chain)
+        self.strategic_action_update: StrategicActionUpdate = (
+            StrategicActionUpdateFactory(
+                strategic_action=strategic_action,
+                supply_chain=strategic_action.supply_chain,
+            )
+        )
+
+    def test_implementation_rag_rating_field_choices_are_green_amber_red(self):
+        """
+        These fields are RED, AMBER, GREEN in their definition but are used in the opposite order,
+        so let's test that they are in fact reversed.
+        """
+        assert (
+            StrategicActionUpdate._meta.get_field("implementation_rag_rating").choices[
+                0
+            ][0]
+            == "GREEN"
+        )
+        assert (
+            StrategicActionUpdate._meta.get_field("implementation_rag_rating").choices[
+                1
+            ][0]
+            == "AMBER"
+        )
+        assert (
+            StrategicActionUpdate._meta.get_field("implementation_rag_rating").choices[
+                2
+            ][0]
+            == "RED"
+        )
+
+    def test_some_completion_date_for_existing_date(self):
+        assert self.strategic_action_update.some_completion_date() is not None
+
+    def test_some_completion_date_for_new_date_is_new_date(self):
+        original_date = (
+            self.strategic_action_update.strategic_action.target_completion_date
+        )
+        changed_date = original_date + relativedelta(month=6)
+        self.strategic_action_update.strategic_action.target_completion_date = None
+        self.strategic_action_update.strategic_action.save()
+        self.strategic_action_update.changed_target_completion_date = changed_date
+        self.strategic_action_update.save()
+
+        expected_date = changed_date
+        actual_date = self.strategic_action_update.some_completion_date()
+        assert actual_date is not None
+        assert actual_date == expected_date
+
+    def test_some_completion_date_for_existing_and_new_date_is_existing_date(self):
+        original_date = (
+            self.strategic_action_update.strategic_action.target_completion_date
+        )
+        changed_date = original_date + relativedelta(month=6)
+        self.strategic_action_update.changed_target_completion_date = changed_date
+        self.strategic_action_update.save()
+
+        expected_date = original_date
+        actual_date = self.strategic_action_update.some_completion_date()
+        assert actual_date is not None
+        assert actual_date == expected_date
+
+    def test_some_completion_date_for_neither_date_is_none(self):
+        self.strategic_action_update.strategic_action.target_completion_date = None
+        self.strategic_action_update.strategic_action.save()
+        self.strategic_action_update.changed_target_completion_date = None
+        self.strategic_action_update.save()
+
+        actual_date = self.strategic_action_update.some_completion_date()
+        assert actual_date is None
+
+    def test_has_existing_target_completion_date_true(self):
+        assert self.strategic_action_update.has_existing_target_completion_date
+
+    def test_has_existing_target_completion_date_false(self):
+        self.strategic_action_update.strategic_action.target_completion_date = None
+        self.strategic_action_update.strategic_action.save()
+        assert not self.strategic_action_update.has_existing_target_completion_date
+
+    def test_has_changed_target_completion_date_true(self):
+        original_date = (
+            self.strategic_action_update.strategic_action.target_completion_date
+        )
+        changed_date = original_date + relativedelta(month=6)
+        self.strategic_action_update.changed_target_completion_date = changed_date
+        self.strategic_action_update.save()
+        assert self.strategic_action_update.has_changed_target_completion_date
+
+    def test_has_changed_target_completion_date_false(self):
+        self.strategic_action_update.changed_target_completion_date = None
+        self.strategic_action_update.save()
+        assert not self.strategic_action_update.has_changed_target_completion_date
+
+    def test_has_updated_target_completion_date_true_as_original_date_and_changed_date(
+        self,
+    ):
+        original_date = (
+            self.strategic_action_update.strategic_action.target_completion_date
+        )
+        changed_date = original_date + relativedelta(month=6)
+        self.strategic_action_update.changed_target_completion_date = changed_date
+        self.strategic_action_update.save()
+        assert self.strategic_action_update.has_updated_target_completion_date
+
+    def test_has_updated_target_completion_date_false_as_changed_date_but_no_original_date(
+        self,
+    ):
+        original_date = (
+            self.strategic_action_update.strategic_action.target_completion_date
+        )
+        changed_date = original_date + relativedelta(month=6)
+        self.strategic_action_update.strategic_action.target_completion_date = None
+        self.strategic_action_update.strategic_action.save()
+        self.strategic_action_update.changed_target_completion_date = changed_date
+        self.strategic_action_update.save()
+        assert not self.strategic_action_update.has_updated_target_completion_date
+
+    def test_has_updated_target_completion_date_false_as_original_date_but_no_changed_date(
+        self,
+    ):
+        self.strategic_action_update.changed_target_completion_date = None
+        self.strategic_action_update.save()
+        assert not self.strategic_action_update.has_updated_target_completion_date
+
+    def test_has_updated_target_completion_date_false_as_neither_original_nor_changed_date(
+        self,
+    ):
+        self.strategic_action_update.strategic_action.target_completion_date = None
+        self.strategic_action_update.strategic_action.save()
+        self.strategic_action_update.changed_target_completion_date = None
+        self.strategic_action_update.save()
+        assert not self.strategic_action_update.has_updated_target_completion_date
+
+    def test_has_new_target_completion_date_false_as_original_date_and_changed_date(
+        self,
+    ):
+        original_date = (
+            self.strategic_action_update.strategic_action.target_completion_date
+        )
+        changed_date = original_date + relativedelta(month=6)
+        self.strategic_action_update.changed_target_completion_date = changed_date
+        self.strategic_action_update.save()
+        assert not self.strategic_action_update.has_new_target_completion_date
+
+    def test_has_new_target_completion_date_true_as_changed_date_but_no_original_date(
+        self,
+    ):
+        original_date = (
+            self.strategic_action_update.strategic_action.target_completion_date
+        )
+        changed_date = original_date + relativedelta(month=6)
+        self.strategic_action_update.strategic_action.target_completion_date = None
+        self.strategic_action_update.strategic_action.save()
+        self.strategic_action_update.changed_target_completion_date = changed_date
+        self.strategic_action_update.save()
+        assert self.strategic_action_update.has_new_target_completion_date
+
+    def test_has_new_target_completion_date_false_as_original_date_but_no_changed_date(
+        self,
+    ):
+        self.strategic_action_update.changed_target_completion_date = None
+        self.strategic_action_update.save()
+        assert not self.strategic_action_update.has_new_target_completion_date
+
+    def test_has_new_target_completion_date_false_as_neither_original_nor_changed_date(
+        self,
+    ):
+        self.strategic_action_update.strategic_action.target_completion_date = None
+        self.strategic_action_update.strategic_action.save()
+        self.strategic_action_update.changed_target_completion_date = None
+        self.strategic_action_update.save()
+        assert not self.strategic_action_update.has_new_target_completion_date
+
+    def test_has_no_target_completion_date_false_as_original_date_and_changed_date(
+        self,
+    ):
+        original_date = (
+            self.strategic_action_update.strategic_action.target_completion_date
+        )
+        changed_date = original_date + relativedelta(month=6)
+        self.strategic_action_update.changed_target_completion_date = changed_date
+        self.strategic_action_update.save()
+        assert not self.strategic_action_update.has_no_target_completion_date
+
+    def test_has_no_target_completion_date_false_as_changed_date_but_no_original_date(
+        self,
+    ):
+        original_date = (
+            self.strategic_action_update.strategic_action.target_completion_date
+        )
+        changed_date = original_date + relativedelta(month=6)
+        self.strategic_action_update.strategic_action.target_completion_date = None
+        self.strategic_action_update.strategic_action.save()
+        self.strategic_action_update.changed_target_completion_date = changed_date
+        self.strategic_action_update.save()
+        assert not self.strategic_action_update.has_no_target_completion_date
+
+    def test_has_no_target_completion_date_false_as_original_date_but_no_changed_date(
+        self,
+    ):
+        self.strategic_action_update.changed_target_completion_date = None
+        self.strategic_action_update.save()
+        assert not self.strategic_action_update.has_no_target_completion_date
+
+    def test_has_no_target_completion_date_true_as_neither_original_nor_changed_date(
+        self,
+    ):
+        self.strategic_action_update.strategic_action.target_completion_date = None
+        self.strategic_action_update.strategic_action.save()
+        self.strategic_action_update.changed_target_completion_date = None
+        self.strategic_action_update.save()
+        assert self.strategic_action_update.has_no_target_completion_date
+
+    def test_is_currently_ongoing_true_as_is_ongoing(self):
+        self.strategic_action_update.strategic_action.is_ongoing = True
+        self.strategic_action_update.strategic_action.save()
+        assert self.strategic_action_update.is_currently_ongoing
+
+    def test_is_currently_ongoing_false_as_is_not_ongoing(self):
+        self.strategic_action_update.strategic_action.is_ongoing = False
+        self.strategic_action_update.strategic_action.save()
+        assert not self.strategic_action_update.is_currently_ongoing
+
+    def test_is_becoming_ongoing_false_as_is_ongoing_and_not_changed_is_ongoing(self):
+        self.strategic_action_update.strategic_action.is_ongoing = True
+        self.strategic_action_update.strategic_action.save()
+        self.strategic_action_update.changed_is_ongoing = False
+        self.strategic_action_update.save()
+        assert not self.strategic_action_update.is_becoming_ongoing
+
+    def test_is_becoming_ongoing_true_as_is_ongoing_and_changed_is_ongoing(self):
+        self.strategic_action_update.strategic_action.is_ongoing = True
+        self.strategic_action_update.strategic_action.save()
+        self.strategic_action_update.changed_is_ongoing = True
+        self.strategic_action_update.save()
+        assert self.strategic_action_update.is_becoming_ongoing
+
+    def test_is_becoming_ongoing_true_as_is_not_ongoing_and_changed_is_ongoing(self):
+        self.strategic_action_update.strategic_action.is_ongoing = False
+        self.strategic_action_update.strategic_action.save()
+        self.strategic_action_update.changed_is_ongoing = True
+        self.strategic_action_update.save()
+        assert self.strategic_action_update.is_becoming_ongoing
+
+    def test_is_changing_target_completion_date_false_because_is_neither_changed_ongoing_nor_changed_date(
+        self,
+    ):
+        self.strategic_action_update.changed_target_completion_date = None
+        self.strategic_action_update.changed_is_ongoing = False
+        self.strategic_action_update.save()
+        assert not self.strategic_action_update.is_changing_target_completion_date
+
+    def test_is_changing_target_completion_date_true_because_changed_is_ongoing(self):
+        self.strategic_action_update.strategic_action.is_ongoing = False
+        self.strategic_action_update.strategic_action.save()
+        self.strategic_action_update.changed_target_completion_date = None
+        self.strategic_action_update.changed_is_ongoing = True
+        self.strategic_action_update.save()
+        assert self.strategic_action_update.is_changing_target_completion_date
+
+    def test_is_changing_target_completion_date_true_because_changed_date(self):
+        original_date = (
+            self.strategic_action_update.strategic_action.target_completion_date
+        )
+        changed_date = original_date + relativedelta(month=6)
+        self.strategic_action_update.changed_target_completion_date = changed_date
+        self.strategic_action_update.changed_is_ongoing = False
+        self.strategic_action_update.save()
+        assert self.strategic_action_update.is_changing_target_completion_date

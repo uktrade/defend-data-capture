@@ -1,0 +1,51 @@
+{% extends 'supply_chains/monthly-update-form-base.html' %}
+
+{% block form %}
+    {% include 'supply_chains/includes/mu-existing-completion-date.html' %}
+    <form method="post" action="">
+        {% csrf_token %}
+        <div class="govuk-form-group{% if form.errors %} govuk-form-group--error{% endif %}">
+            <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <h2 class="govuk-fieldset__heading ">
+                        {{ form.implementation_rag_rating.label }}
+                    </h2>
+                </legend>
+                <div class="govuk-body">
+                    <p>When considering if delivery of the strategic action is on track, consider:</p>
+                    <ul>
+                        <li>costs</li>
+                        <li>timings</li>
+                        <li>quality.</li>
+                    </ul>
+                    {% with strategic_action_update.strategic_action.last_submitted_update as previous_update %}
+                        {% if previous_update.content %}
+                            <p>Your last status update was {{ previous_update.implementation_rag_rating|lower }}</p>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                {% if form.implementation_rag_rating.errors %}
+                    {% for error in form.implementation_rag_rating.errors %}
+                        <span class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span> {{ error }}
+                            </span>
+                    {% endfor %}
+                {% endif %}
+                <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+                    {% for radio in form.implementation_rag_rating %}
+                        {{ radio.tag }}
+                    {% endfor %}
+                </div>
+            </fieldset>
+        </div>
+        <div class="govuk-button-group">
+            <button class="govuk-button" data-module="govuk-button" type="submit">
+                Save and continue
+            </button>
+
+            <a href="{% url 'tlist' sc_slug=strategic_action_update.supply_chain.slug %}" class="govuk-button govuk-button--secondary" data-module="govuk-button" type="button">
+                Cancel
+            </a>
+        </div>
+    </form>
+{% endblock form %}

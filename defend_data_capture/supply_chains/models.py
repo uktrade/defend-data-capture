@@ -1,3 +1,5 @@
+from datetime import date, datetime, timedelta
+
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -7,12 +9,28 @@ import reversion
 
 from accounts.models import GovDepartment
 import uuid
+from .utils import get_last_working_day_of_previous_month
 
 
 class RAGRating(models.TextChoices):
     RED = ("RED", "Red")
     AMBER = ("AMBER", "Amber")
     GREEN = ("GREEN", "Green")
+
+
+RAGRatingHintsText = [
+    "There is an issue with delivery of an action. This will require escalation and further support. There is a "
+    "potential risk to the expected completion date.",
+    "There's a potential risk to delivery that needs monitoring.",
+    "Delivery is on track with no issues",
+]
+
+RAGRatingHints = {
+    rating[0]: help_text
+    for rating, help_text in zip(
+        reversed(RAGRating.choices), reversed(RAGRatingHintsText)
+    )
+}
 
 
 class SupplyChainQuerySet(models.QuerySet):
@@ -47,7 +65,7 @@ class SupplyChain(models.Model):
         max_length=6,
     )
     risk_severity_status_disagree_reason = models.TextField(blank=True)
-    slug = models.SlugField(null=True)
+    slug = models.SlugField(null=True, blank=True)
     is_archived = models.BooleanField(default=False)
     archived_date = models.DateField(null=True, blank=True)
 
@@ -57,6 +75,9 @@ class SupplyChain(models.Model):
         if self.is_archived and self.archived_date is None:
             self.archived_date = timezone.now().date()
         return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"SC: {self.name}, {self.gov_department.name}"
 
 
 @reversion.register()
@@ -105,7 +126,7 @@ class StrategicAction(models.Model):
         max_length=24, choices=SupportingOrgs.choices, blank=True
     )
     is_ongoing = models.BooleanField(default=False)
-    target_completion_date = models.DateField(null=True)
+    target_completion_date = models.DateField(null=True, blank=True)
     is_archived = models.BooleanField(default=False)
     archived_date = models.DateField(null=True, blank=True)
     archived_reason = models.TextField(blank=True)
@@ -122,7 +143,7 @@ class StrategicAction(models.Model):
         on_delete=models.PROTECT,
         related_name="strategic_actions",
     )
-    slug = models.SlugField(null=True)
+    slug = models.SlugField(null=True, blank=True)
 
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)
@@ -139,10 +160,26 @@ class StrategicAction(models.Model):
         self.full_clean()
         return super().save(*args, **kwargs)
 
+    def last_submitted_update(self):
+        return self.monthly_updates.last_month()
+
+    def __str__(self):
+        return f"SA: {self.name}, {self.supply_chain.gov_department.name}, {self.get_geographic_scope_display()}, SC: {self.supply_chain.name}"
+
 
 class SAUQuerySet(models.QuerySet):
     def since(self, deadline, *args, **kwargs):
         return self.filter(date_created__gt=deadline, *args, **kwargs)
+
+    def last_month(self, before_date=None):
+        if before_date is None:
+            before_date = datetime.now().date()
+        last_month_deadline = get_last_working_day_of_previous_month()
+        return (
+            self.filter(submission_date__lte=last_month_deadline)
+            .order_by("-submission_date")
+            .first()
+        )
 
 
 class StrategicActionUpdate(models.Model):
@@ -162,15 +199,20 @@ class StrategicActionUpdate(models.Model):
  users know whether they have completed all required fields for an update.
  The 'submitted' status refers to when a user can no longer edit an update.""",
     )
-    submission_date = models.DateField(null=True)
+    submission_date = models.DateField(null=True, blank=True)
     date_created = models.DateField(auto_now_add=True)
     content = models.TextField(blank=True)
     implementation_rag_rating = models.CharField(
         max_length=5,
-        choices=RAGRating.choices,
+        choices=reversed(RAGRating.choices),
         blank=True,
+        default=None,
+        null=True,
     )
     reason_for_delays = models.TextField(blank=True)
+    changed_target_completion_date = models.DateField(null=True, blank=True)
+    reason_for_completion_date_change = models.TextField(blank=True)
+    changed_is_ongoing = models.BooleanField(null=True, default=False)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
@@ -187,13 +229,88 @@ class StrategicActionUpdate(models.Model):
         on_delete=models.PROTECT,
         related_name="monthly_updates",
     )
-    slug = models.SlugField(null=True)
+    slug = models.SlugField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         if not self.slug:
             self.slug = self.date_created.strftime("%m-%Y")
+            try:
+                kwargs.pop("force_insert")
+            except KeyError:
+                pass
+            self.save(*args, **kwargs)
 
-        return super().save(*args, **kwargs)
+    def __str__(self):
+        return f"SAU: {self.strategic_action.name}, {self.slug}, {self.get_status_display()}"
+
+    def some_completion_date(self):
+        if self.strategic_action.target_completion_date is not None:
+            return self.strategic_action.target_completion_date
+        if self.changed_target_completion_date is not None:
+            return self.changed_target_completion_date
+        return None
+
+    @property
+    def has_existing_target_completion_date(self):
+        return self.strategic_action.target_completion_date is not None
+
+    @property
+    def has_changed_target_completion_date(self):
+        return self.changed_target_completion_date is not None
+
+    @property
+    def has_updated_target_completion_date(self):
+        return (
+            self.changed_target_completion_date is not None
+            and self.has_existing_target_completion_date
+        )
+
+    @property
+    def has_new_target_completion_date(self):
+        return (
+            self.changed_target_completion_date is not None
+            and not self.has_existing_target_completion_date
+        )
+
+    @property
+    def has_no_target_completion_date(self):
+        return (
+            not self.has_changed_target_completion_date
+            and not self.has_existing_target_completion_date
+        )
+
+    @property
+    def is_currently_ongoing(self):
+        return self.strategic_action.is_ongoing
+
+    @property
+    def is_becoming_ongoing(self):
+        return self.changed_is_ongoing
+
+    @property
+    def has_no_is_ongoing(self):
+        return not self.is_currently_ongoing and not self.is_becoming_ongoing
+
+    @property
+    def is_changing_is_ongoing(self):
+        return self.is_becoming_ongoing and (
+            self.is_currently_ongoing or self.has_existing_target_completion_date
+        )
+
+    @property
+    def has_new_is_ongoing(self):
+        return self.is_becoming_ongoing and not (
+            self.is_currently_ongoing or self.has_existing_target_completion_date
+        )
+
+    @property
+    def is_changing_target_completion_date(self):
+        return self.has_updated_target_completion_date or self.is_changing_is_ongoing
+
+    @property
+    def has_no_timing_information(self):
+        return self.has_no_target_completion_date and self.has_no_is_ongoing
 
 
 class MaturitySelfAssessment(models.Model):

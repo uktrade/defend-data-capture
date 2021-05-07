@@ -1,0 +1,16 @@
+<div class="govuk-radios__item">
+    {% include 'django/forms/widgets/input.html' %}
+    <label class="govuk-label govuk-radios__label" for="{{ widget.attrs.id }}">
+        {{ widget.label }}
+    </label>
+    {% if widget.dit_hint %}
+        <div id="{{ widget.attrs.id }}-hint" class="govuk-hint govuk-radios__hint">
+            {{ widget.dit_hint }}
+        </div>
+    {% endif %}
+</div>
+{% if widget.dit_detail %}
+    <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="{{ widget.attrs.id }}-detail">
+        {% include widget.dit_detail.template with form=widget.dit_detail.form %}
+    </div>
+{% endif %}

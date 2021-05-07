@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+    {% include "supply_chains/includes/monthly_update_form_breadcrumbs.html" %}
+{% endblock breadcrumbs %}
+
+{% block body %}
+    {% include "supply_chains/includes/gds-error-summary.html" %}
+    <h1 class="govuk-heading-xl">Strategic action monthly update</h1>
+    {% block form %}{% endblock form %}
+{% endblock body %}

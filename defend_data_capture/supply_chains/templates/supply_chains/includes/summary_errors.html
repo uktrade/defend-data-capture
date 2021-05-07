@@ -1,0 +1,5 @@
+{% for field_name, errors in form.errors.items %}
+    {% for error in errors %}
+        <span class="govuk-error-message">{{ error }}</span><br>
+    {% endfor %}
+{% endfor %}

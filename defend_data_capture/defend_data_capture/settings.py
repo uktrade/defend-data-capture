@@ -1,7 +1,6 @@
 from pathlib import Path
 import environ
 import os
-
 from django.urls import reverse_lazy
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -40,6 +39,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "reversion",
     "webpack_loader",
+    "django.forms",
 ]
 
 MIDDLEWARE = [
@@ -153,3 +153,5 @@ CHARFIELD_MAX_LENGTH = 250
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assets"),
 ]
+
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"

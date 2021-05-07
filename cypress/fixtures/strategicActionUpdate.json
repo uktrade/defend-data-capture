@@ -1,0 +1,104 @@
+[
+{
+  "model": "supply_chains.strategicactionupdate",
+  "pk": "1d845102-56e2-4b3e-bfde-e1f2581e5514",
+  "fields": {
+    "status": "submitted",
+    "submission_date": "2021-02-28",
+    "date_created": "2021-03-31",
+    "content": "Strategic action update submitted last month for SA with no completion date.",
+    "implementation_rag_rating": "GREEN",
+    "reason_for_delays": "",
+    "user": "8ffdf4f4-ea0d-4727-947c-f741f0ac6959",
+    "strategic_action": "fd317f3e-9ce0-4ed0-9a6a-baf7c6e65989",
+    "supply_chain": "4c8fcc98-aa4e-402b-9ff4-b06ae3c3dcd1",
+    "slug": "ulm-ncd"
+  }
+},
+  {
+    "model": "supply_chains.strategicactionupdate",
+    "pk": "87655102-56e2-4b3e-bfde-e1f2581e8765",
+    "fields": {
+      "status": "submitted",
+      "submission_date": "2021-02-28",
+      "date_created": "2021-03-31",
+      "content": "Strategic action update submitted last month for SA with a completion date.",
+      "implementation_rag_rating": "GREEN",
+      "reason_for_delays": "",
+      "user": "8ffdf4f4-ea0d-4727-947c-f741f0ac6959",
+      "strategic_action": "e4ff7167-9298-45ed-bcca-7c8a923be491",
+      "supply_chain": "f6787b31-a016-4c9a-92a9-03be1b656cb4",
+      "slug": "ulm-cd"
+    }
+  },
+{
+  "model": "supply_chains.strategicactionupdate",
+  "pk": "20b45066-298f-4d01-8910-b166079d22d8",
+  "fields": {
+    "status": "in_progress",
+    "submission_date": "2021-01-31",
+    "date_created": "2021-02-28",
+    "content": "This is the content, now edited in the form.\r\n\r\nAnd another edit :-)",
+    "implementation_rag_rating": "RED",
+    "reason_for_delays": "This is the reason for delay field.",
+    "user": "8ffdf4f4-ea0d-4727-947c-f741f0ac6959",
+    "strategic_action": "55b22a7f-65fa-48c5-82f2-7918214936c5",
+    "supply_chain": "4c8fcc98-aa4e-402b-9ff4-b06ae3c3dcd1",
+    "slug": "na"
+  }
+},
+{
+  "model": "supply_chains.strategicactionupdate",
+  "pk": "5ea30630-beb5-4d62-87a7-9a5dcde862a9",
+  "fields": {
+    "status": "in_progress",
+    "submission_date": null,
+    "date_created": "2021-01-31",
+    "content": "This is an imaginary strategic action update submitted last month. It is in progress.",
+    "implementation_rag_rating": "",
+    "reason_for_delays": "",
+    "user": null,
+    "strategic_action": "982bda67-4808-4231-b16b-c1f84c4ea110",
+    "supply_chain": "4c8fcc98-aa4e-402b-9ff4-b06ae3c3dcd1",
+    "slug": "na2"
+  }
+},
+  {
+    "model": "supply_chains.strategicactionupdate",
+    "pk": "1303cbce-82c5-4cb9-b1d6-d96519f40882",
+    "fields": {
+      "status": "submitted",
+      "submission_date": "2021-04-22",
+      "date_created": "2021-04-07",
+      "content": "MU Form Test 1",
+      "implementation_rag_rating": "GREEN",
+      "reason_for_delays": "",
+      "changed_target_completion_date": null,
+      "reason_for_completion_date_change": "",
+      "changed_is_ongoing": false,
+      "user": "8ffdf4f4-ea0d-4727-947c-f741f0ac6959",
+      "strategic_action": "223f148b-7fa8-4b55-9f94-41e812a2b285",
+      "supply_chain": "a69d5624-1316-49a6-8a1a-4ac935ad13e3",
+      "slug": "04-2021"
+    }
+  },
+  {
+    "model": "supply_chains.strategicactionupdate",
+    "pk": "1c18c53b-2f7a-4539-8b34-6a12d7ba371e",
+    "fields": {
+      "status": "submitted",
+      "submission_date": "2021-04-28",
+      "date_created": "2021-04-07",
+      "content": "MU Form Test 0",
+      "implementation_rag_rating": null,
+      "reason_for_delays": "",
+      "changed_target_completion_date": null,
+      "reason_for_completion_date_change": "",
+      "changed_is_ongoing": false,
+      "user": "8ffdf4f4-ea0d-4727-947c-f741f0ac6959",
+      "strategic_action": "668be471-acd3-4eee-9a37-8debdff786a1",
+      "supply_chain": "a69d5624-1316-49a6-8a1a-4ac935ad13e3",
+      "slug": "04-2021"
+    }
+  }
+]

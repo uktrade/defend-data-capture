@@ -8,8 +8,8 @@ from supply_chains.test.factories import SupplyChainFactory
 from supply_chains.utils import (
     get_last_working_day_of_a_month,
     get_last_working_day_of_previous_month,
-    check_matching_gov_department,
 )
+from supply_chains.mixins import check_matching_gov_department
 
 
 @pytest.mark.parametrize(

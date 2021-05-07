@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+    {% include "supply_chains/includes/monthly_update_form_breadcrumbs.html" %}
+{% endblock breadcrumbs %}
+
+{% block body %}
+    {% include "supply_chains/includes/gds-summary-page-error-summary.html" %}
+    <h1 class="govuk-heading-xl">Strategic action monthly update</h1>
+    <h2 class="govuk-heading-m">Check your answers</h2>
+    <p class="govuk-body">Check all the information you've provided is correct before submitting the form.</p>
+    {# Always include the content form #}
+    {% with form.forms.MonthlyUpdateInfoForm as form %}
+    <dl class="govuk-summary-list govuk-!-margin-bottom-3">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                Latest monthly update
+            </dt>
+            <dd class="govuk-summary-list__value">
+                {% if form.errors %}
+                    {% include "supply_chains/includes/summary_errors.html" %}
+                {% else %}
+                    {{ strategic_action_update.content }}
+                {% endif %}
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link" href="{% url 'monthly-update-info-edit'  supply_chain_slug=strategic_action_update.strategic_action.supply_chain.slug strategic_action_slug=strategic_action_update.strategic_action.slug update_slug=strategic_action_update.slug %}">
+                    Change<span class="govuk-visually-hidden"> latest monthly update</span>
+                </a>
+            </dd>
+        </div>
+    </dl>
+    {% endwith %}
+    {# Only include the Timing form if it exists #}
+    {% with form.forms.MonthlyUpdateTimingForm as form %}
+        {% if form %}
+            <dl class="govuk-summary-list govuk-!-margin-bottom-3">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Estimated date of completion
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {% if form.errors %}
+                            {% include "supply_chains/includes/summary_errors.html" %}
+                        {% else %}
+                            {% if  strategic_action_update.has_new_is_ongoing%}
+                                Ongoing
+                            {% else %}
+                                {{ strategic_action_update.changed_target_completion_date|date:"j F Y" }}
+                            {% endif %}
+                        {% endif %}
+                    </dd>
+                    <dd class="govuk-summary-list__actions">
+                        <a class="govuk-link" href="{% url 'monthly-update-timing-edit' supply_chain_slug=strategic_action_update.strategic_action.supply_chain.slug strategic_action_slug=strategic_action_update.strategic_action.slug update_slug=strategic_action_update.slug %}">
+                            Change<span class="govuk-visually-hidden"> estimated date of completion</span>
+                        </a>
+                    </dd>
+                </div>
+            </dl>
+        {% endif %}
+    {% endwith %}
+    {# another chance to include the timing form… not sure what this is doing here #}
+{#    {% if has_new_date_of_completion %}#}
+{#        {% with form.forms.MonthlyUpdateTimingForm as form %}#}
+{#        <dl class="govuk-summary-list govuk-!-margin-bottom-3">#}
+{#            <div class="govuk-summary-list__row">#}
+{#                <dt class="govuk-summary-list__key">#}
+{#                    Estimated date of completion#}
+{#                </dt>#}
+{#                <dd class="govuk-summary-list__value">#}
+{#                    {% if form.errors %}#}
+{#                        {% include "supply_chains/includes/summary_errors.html" %}#}
+{#                    {% else %}#}
+{#                        Timing stuff here#}
+{#                    {% endif %}#}
+{#                    {{ strategic_action_update.changed_target_completion_date|date:"j F Y" }}#}
+{#                </dd>#}
+{#                <dd class="govuk-summary-list__actions">#}
+{#                    <a class="govuk-link" href="{% url 'monthly-update-timing-edit' supply_chain_slug=strategic_action_update.strategic_action.supply_chain.slug strategic_action_slug=strategic_action_update.strategic_action.slug update_slug=strategic_action_update.slug %}">#}
+{#                        Change<span class="govuk-visually-hidden"> revised estimated date of completion</span>#}
+{#                    </a>#}
+{#                </dd>#}
+{#            </div>#}
+{#        </dl>#}
+{#        {% endwith %}#}
+{#    {% endif %}#}
+    {# Always include the delivery status #}
+    {% with form.forms.MonthlyUpdateStatusForm as form %}
+    <dl class="govuk-summary-list govuk-!-margin-bottom-3">
+        <div class="govuk-summary-list__row{% if not has_revised_date_of_completion %} govuk-summary-list__row--no-border{% endif %}">
+            <dt class="govuk-summary-list__key">
+                Current delivery status
+            </dt>
+            <dd class="govuk-summary-list__value">
+                {% if form.errors %}
+                    {% include "supply_chains/includes/summary_errors.html" %}
+                {% else %}
+                    {{ strategic_action_update.get_implementation_rag_rating_display }}
+                    {% if strategic_action_update.implementation_rag_rating != 'GREEN' %}
+                        <br>
+                        {{ strategic_action_update.reason_for_delays }}
+                    {% endif %}
+                {% endif %}
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link" href="{% url 'monthly-update-status-edit' supply_chain_slug=strategic_action_update.strategic_action.supply_chain.slug strategic_action_slug=strategic_action_update.strategic_action.slug update_slug=strategic_action_update.slug %}">
+                    Change<span class="govuk-visually-hidden"> current delivery status</span>
+                </a>
+            </dd>
+        </div>
+    </dl>
+    {% endwith %}
+    {# Only include the revised timing form if it exists #}
+    {% with form.forms.MonthlyUpdateRevisedTimingForm as form %}
+        {% if form %}
+            <dl class="govuk-summary-list govuk-!-margin-bottom-3">
+                <div class="govuk-summary-list__row govuk-summary-list__row--no-border class.">
+                    <dt class="govuk-summary-list__key">
+                        Revised estimated date of completion
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {% if form.errors %}
+                            {% include "supply_chains/includes/summary_errors.html" %}
+                        {% else %}
+                            {% if  strategic_action_update.has_new_is_ongoing%}
+                                Ongoing
+                            {% else %}
+                                {{ strategic_action_update.changed_target_completion_date|date:"j F Y" }}
+                            {% endif %}
+                        {% endif %}
+                    </dd>
+                    <dd class="govuk-summary-list__actions">
+                        <a class="govuk-link" href="{% url 'monthly-update-revised-timing-edit' supply_chain_slug=strategic_action_update.strategic_action.supply_chain.slug strategic_action_slug=strategic_action_update.strategic_action.slug update_slug=strategic_action_update.slug %}">
+                            Change<span class="govuk-visually-hidden"> revised estimated date of completion</span>
+                        </a>
+                    </dd>
+                </div>
+            </dl>
+        {% endif %}
+    {% endwith %}
+    <form action="" method="post" novalidate>
+        {% csrf_token %}
+        <div class="govuk-button-group">
+            <button class="govuk-button" data-module="govuk-button" type="submit">
+                Submit
+            </button>
+
+            <a href="{% url 'tlist' sc_slug=strategic_action_update.supply_chain.slug %}" class="govuk-button govuk-button--secondary" data-module="govuk-button" type="button">
+                Cancel
+            </a>
+        </div>
+    </form>
+
+{% endblock body %}

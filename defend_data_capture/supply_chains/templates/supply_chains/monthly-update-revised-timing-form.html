@@ -1,0 +1,38 @@
+{% extends 'supply_chains/monthly-update-form-base.html' %}
+
+{% block form %}
+    {% include 'supply_chains/includes/mu-existing-completion-date.html' %}
+    <form method="post" action="">
+        {% csrf_token %}
+        <div class="govuk-form-group{% if form.is_completion_date_known.errors %} govuk-form-group--error{% endif %}">
+            <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <h2 class="govuk-fieldset__heading ">
+                        {{ form.is_completion_date_known.label }}
+                    </h2>
+                </legend>
+                {% if form.is_completion_date_known.errors %}
+                    {% for error in form.is_completion_date_known.errors %}
+                        <span class="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span> {{ error }}
+                    </span>
+                    {% endfor %}
+                {% endif %}
+                <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+                    {% for radio in form.is_completion_date_known %}
+                        {{ radio.tag }}
+                    {% endfor %}
+                </div>
+            </fieldset>
+        </div>
+        <div class="govuk-button-group">
+            <button class="govuk-button" data-module="govuk-button" type="submit">
+                Save and continue
+            </button>
+
+            <a href="{% url 'tlist' sc_slug=strategic_action_update.supply_chain.slug %}" class="govuk-button govuk-button--secondary" data-module="govuk-button" type="button">
+                Cancel
+            </a>
+        </div>
+    </form>
+{% endblock form %}

@@ -318,5 +318,203 @@
       "supply_chain": "f6787b31-a016-4c9a-92a9-03be1b656cb4",
       "slug": "strategic-action-6"
     }
+  },
+  {
+    "model": "supply_chains.strategicaction",
+    "pk": "223f148b-7fa8-4b55-9f94-41e812a2b285",
+    "fields": {
+      "name": "MU Form Test 1 PU CD",
+      "start_date": "2020-12-15",
+      "description": "Has an update from previous month and a completion date",
+      "impact": "Nugatory",
+      "category": "diversify",
+      "geographic_scope": "uk_wide",
+      "supporting_organisations": "",
+      "is_ongoing": false,
+      "target_completion_date": "2022-05-01",
+      "is_archived": false,
+      "archived_date": null,
+      "archived_reason": "",
+      "specific_related_products": "",
+      "other_dependencies": "",
+      "supply_chain": "a69d5624-1316-49a6-8a1a-4ac935ad13e3",
+      "slug": "mu-form-test-1"
+    }
+  },
+  {
+    "model": "supply_chains.strategicaction",
+    "pk": "30050321-bc5a-44ce-ade4-85bdeb110883",
+    "fields": {
+      "name": "MU Form Test 3 NPU CD",
+      "start_date": "2021-05-07",
+      "description": "Has no update from previous month and a completion date",
+      "impact": "Extreme",
+      "category": "partner",
+      "geographic_scope": "england_only",
+      "supporting_organisations": "",
+      "is_ongoing": false,
+      "target_completion_date": "2022-02-01",
+      "is_archived": false,
+      "archived_date": null,
+      "archived_reason": "",
+      "specific_related_products": "",
+      "other_dependencies": "",
+      "supply_chain": "a69d5624-1316-49a6-8a1a-4ac935ad13e3",
+      "slug": "mu-form-test-3"
+    }
+  },
+  {
+    "model": "supply_chains.strategicaction",
+    "pk": "56e8009f-5aec-462c-bdad-0061618eae7d",
+    "fields": {
+      "name": "MU Form Test 4 NPU CD WE",
+      "start_date": "2021-05-07",
+      "description": "Has no update from previous month and a completion date and will be submitted with errors",
+      "impact": "Not a lot",
+      "category": "create",
+      "geographic_scope": "uk_wide",
+      "supporting_organisations": "",
+      "is_ongoing": false,
+      "target_completion_date": null,
+      "is_archived": false,
+      "archived_date": null,
+      "archived_reason": "",
+      "specific_related_products": "",
+      "other_dependencies": "",
+      "supply_chain": "a69d5624-1316-49a6-8a1a-4ac935ad13e3",
+      "slug": "mu-form-test-4"
+    }
+  },
+  {
+    "model": "supply_chains.strategicaction",
+    "pk": "668be471-acd3-4eee-9a37-8debdff786a1",
+    "fields": {
+      "name": "MU Form Test 0 PU NCD",
+      "start_date": "2021-01-11",
+      "description": "Has an update from previous month and no completion date",
+      "impact": "Profound",
+      "category": "create",
+      "geographic_scope": "uk_wide",
+      "supporting_organisations": "",
+      "is_ongoing": false,
+      "target_completion_date": null,
+      "is_archived": false,
+      "archived_date": null,
+      "archived_reason": "",
+      "specific_related_products": "",
+      "other_dependencies": "",
+      "supply_chain": "a69d5624-1316-49a6-8a1a-4ac935ad13e3",
+      "slug": "mu-form-test-0"
+    }
+  },
+  {
+    "model": "supply_chains.strategicaction",
+    "pk": "9d63e844-98af-4f9a-9e1b-2220c715ed42",
+    "fields": {
+      "name": "MU Form Test 2 NPU NCD",
+      "start_date": "2021-02-01",
+      "description": "Has no update from previous month and no completion date",
+      "impact": "Minimal",
+      "category": "expand",
+      "geographic_scope": "england_only",
+      "supporting_organisations": "",
+      "is_ongoing": false,
+      "target_completion_date": null,
+      "is_archived": false,
+      "archived_date": null,
+      "archived_reason": "",
+      "specific_related_products": "",
+      "other_dependencies": "",
+      "supply_chain": "a69d5624-1316-49a6-8a1a-4ac935ad13e3",
+      "slug": "mu-form-test-2"
+    }
+  },
+  {
+    "model": "supply_chains.strategicaction",
+    "pk": "b5a37c2d-67e4-4f4e-a0d5-e04173a76c2c",
+    "fields": {
+      "name": "MU Form Test 5 NPU NCD WE",
+      "start_date": "2021-05-07",
+      "description": "Has no update from previous month and no completion date and will be submitted with errors",
+      "impact": "Yes",
+      "category": "diversify",
+      "geographic_scope": "uk_wide",
+      "supporting_organisations": "",
+      "is_ongoing": false,
+      "target_completion_date": null,
+      "is_archived": false,
+      "archived_date": null,
+      "archived_reason": "",
+      "specific_related_products": "",
+      "other_dependencies": "",
+      "supply_chain": "a69d5624-1316-49a6-8a1a-4ac935ad13e3",
+      "slug": "mu-form-test-5"
+    }
+  },
+  {
+    "model": "supply_chains.strategicaction",
+    "pk": "e3ff7167-9298-45ed-bcca-7c8a923be491",
+    "fields": {
+      "name": "Strategic action 1",
+      "start_date": "1982-03-07",
+      "description": "Cover than item risk difficult.",
+      "impact": "Nugatory",
+      "category": "diversify",
+      "geographic_scope": "uk_wide",
+      "supporting_organisations": "",
+      "is_ongoing": false,
+      "target_completion_date": "2022-12-25",
+      "is_archived": false,
+      "archived_date": null,
+      "archived_reason": "",
+      "specific_related_products": "",
+      "other_dependencies": "",
+      "supply_chain": "107f8ea4-aec0-4bea-b68d-a65720c97022",
+      "slug": "strategic-action-1"
+    }
+  },
+  {
+    "model": "supply_chains.strategicaction",
+    "pk": "eec5752e-55ac-4f3e-a96e-75825526b313",
+    "fields": {
+      "name": "Strategic action 2",
+      "start_date": "1984-08-20",
+      "description": "Stock marriage idea add expect visit director.",
+      "impact": "Huge",
+      "category": "expand",
+      "geographic_scope": "uk_wide",
+      "supporting_organisations": "",
+      "is_ongoing": false,
+      "target_completion_date": null,
+      "is_archived": false,
+      "archived_date": null,
+      "archived_reason": "",
+      "specific_related_products": "",
+      "other_dependencies": "",
+      "supply_chain": "14201f69-2d95-4b4c-9523-b44c6c732a80",
+      "slug": "strategic-action-2"
+    }
+  },
+  {
+    "model": "supply_chains.strategicaction",
+    "pk": "fd317f3e-9ce0-4ed0-9a6a-baf7c6e65989",
+    "fields": {
+      "name": "Strategic action 0",
+      "start_date": "1978-03-23",
+      "description": "Garden together job.",
+      "impact": "Negligible",
+      "category": "partner",
+      "geographic_scope": "uk_wide",
+      "supporting_organisations": "",
+      "is_ongoing": false,
+      "target_completion_date": null,
+      "is_archived": false,
+      "archived_date": null,
+      "archived_reason": "",
+      "specific_related_products": "",
+      "other_dependencies": "",
+      "supply_chain": "4c8fcc98-aa4e-402b-9ff4-b06ae3c3dcd1",
+      "slug": "strategic-action-0"
+    }
   }
 ]

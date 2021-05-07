@@ -1,0 +1,9 @@
+<div class="govuk-form-group">
+    <label class="govuk-label" for="{{ form.reason_for_delays.id_for_label }}">
+        {{ form.reason_for_delays.label }}
+    </label>
+    {{ form.reason_for_delays }}
+</div>
+{% if form.will_completion_date_change %}
+    {% include 'supply_chains/includes/yes-no.html' with yes_no_field=form.will_completion_date_change %}
+{% endif %}

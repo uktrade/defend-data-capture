@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-running_locally=${RUNNING_LOCALLY:-true}
-
 # Bring up the db and mock-sso docker containers
 docker-compose -f docker-compose.yaml -f docker-compose.override.yaml up -d
 
@@ -14,17 +12,14 @@ python defend_data_capture/manage.py testserver \
     --noinput \
     cypress/fixtures/govDepartment.json cypress/fixtures/user.json \
     cypress/fixtures/supplyChains.json cypress/fixtures/strategicActions.json \
-    cypress/fixtures/strategicActionUpdates.json \
+    cypress/fixtures/strategicActionUpdate.json \
     & echo $! > backend.pid \
-    & (sleep 5 && npx cypress run --headless --browser chrome)
+    & (sleep 5 && npx cypress run --browser chrome --config-file false -c video=false --config baseUrl=http://localhost:8001 --spec "cypress/integration/monthly_update_new_no_completion_date_spec.js")
 
-cypress_failed=$?
+#npx cypress run --browser chrome --config-file false -c video=false --config baseUrl=http://localhost:8001 --spec "cypress/integration/monthly_update_new_no_completion_date_spec.js"
 
-if [ "$running_locally" == true ]; then
-    # Kill the application using the pid previously saved
-    kill $(cat backend.pid)
-    # Drop the test database
-    docker-compose exec db psql -h localhost -U postgres -c "DROP DATABASE IF EXISTS test_defend"
-fi
+# Kill the application using the pid previously saved
+kill $(cat backend.pid)
 
-exit $cypress_failed
+# Drop the test database
+docker-compose exec db psql -h localhost -U postgres -c "DROP DATABASE IF EXISTS test_defend"

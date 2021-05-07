@@ -1,0 +1,26 @@
+<div class="govuk-form-group">
+    <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+            <h3 class="govuk-fieldset__heading ">
+                {{ yes_no_field.label }}
+            </h3>
+        </legend>
+        {% with yes_no_field.field.widget.details as has_details %}
+            <div class="govuk-radios{% if has_details %}  govuk-radios--conditional{% endif %}"{% if has_details %} data-module="govuk-radios"{% endif %}>
+                {% for radio in yes_no_field %}
+                    <div class="govuk-radios__item">
+                        {{ radio.tag }}
+                        <label class="govuk-label govuk-radios__label" for="{{ radio.id_for_label }}">
+                            {{ radio.choice_label }}
+                        </label>
+                        {% if radio.data.dit_detail %}
+                            <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="{{ radio.id_for_label }}-detail">
+                                {% include radio.data.dit_detail.template with form=radio.data.dit_detail.form %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endwith %}
+    </fieldset>
+</div>
